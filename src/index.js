@@ -127,13 +127,15 @@ class AI {
 }
 
 class Board extends React.Component {
+
   constructor(props) {
     super(props);
     this.state = {
       squares: Array(9).fill(null),
       isNextBot: false,
       winner: null,
-      isGameTie: false
+      isGameTie: false,
+      AiThinking: true
     };
   }
 
@@ -147,15 +149,14 @@ class Board extends React.Component {
       this.setState({
         winner: winner
       });
-      //console.log("Won");
     } else {
-      if (this.state.isNextBot && !this.state.winner) {
-        //console.log("bot move");
+      if (this.state.isNextBot && !this.state.winner && !this.state.isGameTie && !this.state.AiThinking) {
         let ai = new AI();
         let newSquares = ai.handleMove(this.state.squares);
         this.setState({
-          squares: newSquares,
-          isNextBot: !this.state.isNextBot
+            squares: newSquares,
+            isNextBot: !this.state.isNextBot,
+            AiThinking: !this.state.AiThinking
         });
       }
     }
@@ -176,7 +177,15 @@ class Board extends React.Component {
       squares: squares,
       isNextBot: !this.state.isNextBot
     });
+
+    //trick to make AI wait for sometime
+    setTimeout(() => {
+        this.setState({
+            AiThinking: !this.state.AiThinking
+        })
+    }, 1000);
   }
+
 
   renderSquare(i) {
     return (
