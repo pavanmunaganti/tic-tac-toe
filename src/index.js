@@ -135,7 +135,6 @@ class Board extends React.Component {
   render() {
     return (
       <div className="board">
-        <div className="status"></div>
         <div className="board-row">
           {this.renderSquare(0)}
           {this.renderSquare(1)}
@@ -177,15 +176,15 @@ class Game extends React.Component {
     if(step === this.state.stepNumber) return;
     this.setState({
       stepNumber: step,
-      isNextBot: (step % 2) === 0
+      isNextBot: (step % 2) !== 0,
+      //AiThinking: !this.state.AiThinking
     })
   }
-
 
   handleClick(i) {
     //return if current turn is bot's
     if (this.state.isNextBot) return;
-
+    
     const history = this.state.history.slice(0, this.state.stepNumber+1);
     const current = history[history.length-1];
     const squares = current.squares.slice();
@@ -210,8 +209,9 @@ class Game extends React.Component {
         this.setState({
             AiThinking: !this.state.AiThinking
         })
-    }, 1000);
-
+    }, 1500);
+    //console.log(this.state.history);
+    //console.log(this.state.stepNumber)
   }
 
   randomNumber(min, max) {  
@@ -245,6 +245,8 @@ class Game extends React.Component {
 
     let winner = calculateWinner(squares);
     if (winner === -1 && !this.state.isGameTie) {
+      //console.log(this.state.history)
+      //console.log(this.state.stepNumber)
       this.setState({
         isGameTie: true
       });
@@ -264,6 +266,8 @@ class Game extends React.Component {
             isNextBot: !this.state.isNextBot,
             AiThinking: !this.state.AiThinking
         });
+        //console.log(this.state.history)
+        //console.log(this.state.stepNumber)
       }
     }
   }
@@ -275,11 +279,11 @@ class Game extends React.Component {
 
     const moves = history.map((step, move) => {
       const desc = move ?
-        'Go to move #' + move :
-        'Go to game start';
+        'Board state after move ' + move:
+        'Initial state of board';
       return (
         <li key={move}>
-          <button onClick={() => this.jumpTo(move)}>{desc}</button>
+          <button  onClick={() => this.jumpTo(move)}>{desc}</button>
         </li>
       );
     });
@@ -309,7 +313,7 @@ class Game extends React.Component {
             this.state.isNextBot? 'bot':'player'
           ))
         }>{status}</b></div>
-          <ol>{moves}</ol>
+          <ul>{moves}</ul>
         </div>
       </div>
     );

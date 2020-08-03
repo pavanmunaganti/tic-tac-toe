@@ -59,9 +59,13 @@ ul {
 }
 
 .status {
-  margin-bottom: 10px;
   text-align: center;
   font-size: 24px;
+  background-color: skyblue;
+  width: 60%;
+  height: 50px;
+  line-height: 50px;
+  margin: 20px auto;
 }
 
 .square {
@@ -107,6 +111,37 @@ ul {
   background-color: aquamarine;
   width: 50%;
   height: 100%;
+}
+
+.game-info> ul{
+  list-style: none;
+  width: 60%;
+  margin: 50px auto;
+  padding: 0px;
+}
+
+.game-info> ul> li:nth-child(even){
+  background-color: purple;
+}
+
+.game-info> ul> li> button{
+  background-color: #ffffff00;
+  color: white;
+  font-weight: lighter;
+  border: none;
+  width: 100%;
+}
+button:hover{
+  cursor: pointer;
+}
+.game-info> ul> li{
+  height: 30px;
+  line-height: 30px;
+  margin: 5px 0px;
+}
+
+.game-info> ul> li:nth-child(odd){
+  background-color: #3839a3;
 }
 
 @media screen and (max-width: 600px){
