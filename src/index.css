@@ -108,3 +108,22 @@ ul {
   width: 50%;
   height: 100%;
 }
+
+@media screen and (max-width: 600px){
+  .game{
+    display: flex;
+    flex-direction: column;
+  }
+  .game-board, .game-info{
+    width: 100%;
+  }
+
+  .square{
+    font-size: 36px;
+  }
+
+  .status{
+    font-size: 18px;
+  }
+
+}
