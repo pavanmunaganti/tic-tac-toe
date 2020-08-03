@@ -5,7 +5,7 @@ import "./index.css";
 function Square(props) {
   return (
     <button className="square" onClick={() => props.click()}>
-      {props.value}
+      <span className= {props.value === 'X'? 'player':'bot'}>{props.value}</span>
     </button>
   );
 }
@@ -27,7 +27,6 @@ class AI {
         }
       }
     }
-    console.log(bestMoveIndex);
     squares[bestMoveIndex] = "O";
     return squares;
   }
@@ -198,13 +197,19 @@ class Board extends React.Component {
     if (this.state.isGameTie) {
       status = "Tie!";
     } else if (this.state.winner) {
-      status = "Winner:" + this.state.winner;
+      status = this.state.winner === 'X'? "You won!": "You lost, bot won!";
     } else {
-      status = "Next player is:" + (this.state.isNextBot ? " O" : " X");
+      status = (this.state.isNextBot ? "Bot is making a move...." : "It's your turn, make a move");
     }
     return (
       <div className="board">
-        <div className="status">{status}</div>
+        <div className="status"><b className={
+          this.state.isGameTie? 'tie' : (this.state.winner? (
+            this.state.winner === 'X'? 'winner': 'lost'
+          ): (
+            this.state.isNextBot? 'bot':'player'
+          ))
+        }>{status}</b></div>
         <div className="board-row">
           {this.renderSquare(0)}
           {this.renderSquare(1)}
