@@ -4,7 +4,7 @@ import "./index.css";
 //import * as serviceWorker from "./serviceWorker";
 function Square(props) {
   return (
-    <button className="square" onClick={() => props.click()}>
+    <button className="square" onClick={() => props.onClick()}>
       <span className= {props.value === 'X'? 'player':'bot'}>{props.value}</span>
     </button>
   );
@@ -68,7 +68,6 @@ class AI {
 
   minimax(squares, depth, isMaximizingPlayer) {
     let score = this.evaluate(squares);
-
     // return score if 'O' wins the game
     if (score === 10) {
       return score;
@@ -126,90 +125,17 @@ class AI {
 }
 
 class Board extends React.Component {
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      squares: Array(9).fill(null),
-      isNextBot: false,
-      winner: null,
-      isGameTie: false,
-      AiThinking: true
-    };
-  }
-
-  componentDidUpdate() {
-    let winner = calculateWinner(this.state.squares);
-    if (winner === -1 && !this.state.isGameTie) {
-      this.setState({
-        isGameTie: true
-      });
-    } else if (winner !== null && !this.state.winner) {
-      this.setState({
-        winner: winner
-      });
-    } else {
-      if (this.state.isNextBot && !this.state.winner && !this.state.isGameTie && !this.state.AiThinking) {
-        let ai = new AI();
-        let newSquares = ai.handleMove(this.state.squares);
-        this.setState({
-            squares: newSquares,
-            isNextBot: !this.state.isNextBot,
-            AiThinking: !this.state.AiThinking
-        });
-      }
-    }
-  }
-
-  handleClick(i) {
-    //return if current turn is bot's
-    if (this.state.isNextBot) return;
-
-    //retrun if game is already completed or square is already filled
-    const squares = this.state.squares.slice();
-    if (this.state.winner !== null || squares[i] || this.state.isGameTie) {
-      return;
-    }
-
-    squares[i] = "X";
-    this.setState({
-      squares: squares,
-      isNextBot: !this.state.isNextBot
-    });
-
-    //trick to make AI wait for sometime
-    setTimeout(() => {
-        this.setState({
-            AiThinking: !this.state.AiThinking
-        })
-    }, 1000);
-  }
-
-
+//class board begins
   renderSquare(i) {
     return (
-      <Square value={this.state.squares[i]} click={() => this.handleClick(i)} />
+      <Square value={this.props.squares[i]} onClick={() => this.props.onClick(i)} />
     );
   }
 
   render() {
-    let status;
-    if (this.state.isGameTie) {
-      status = "Tie!";
-    } else if (this.state.winner) {
-      status = this.state.winner === 'X'? "You won!": "You lost, bot won!";
-    } else {
-      status = (this.state.isNextBot ? "Bot is making a move...." : "It's your turn, make a move");
-    }
     return (
       <div className="board">
-        <div className="status"><b className={
-          this.state.isGameTie? 'tie' : (this.state.winner? (
-            this.state.winner === 'X'? 'winner': 'lost'
-          ): (
-            this.state.isNextBot? 'bot':'player'
-          ))
-        }>{status}</b></div>
+        <div className="status"></div>
         <div className="board-row">
           {this.renderSquare(0)}
           {this.renderSquare(1)}
@@ -228,18 +154,162 @@ class Board extends React.Component {
       </div>
     );
   }
+  //class ends
 }
 
 class Game extends React.Component {
+  
+  constructor(props){
+    super(props);
+    this.state = {
+      history: [{
+        squares: Array(9).fill(null),
+      }],
+      isNextBot: false,
+      winner: null,
+      isGameTie: false,
+      AiThinking: true,
+      stepNumber: 0
+    };
+  }
+
+  jumpTo(step){
+    if(step === this.state.stepNumber) return;
+    this.setState({
+      stepNumber: step,
+      isNextBot: (step % 2) === 0
+    })
+  }
+
+
+  handleClick(i) {
+    //return if current turn is bot's
+    if (this.state.isNextBot) return;
+
+    const history = this.state.history.slice(0, this.state.stepNumber+1);
+    const current = history[history.length-1];
+    const squares = current.squares.slice();
+
+    //retrun if game is already completed or square is already filled
+    if (this.state.winner !== null || squares[i] || this.state.isGameTie) {
+      return;
+    }
+
+    squares[i] = "X";
+
+    this.setState({
+      history: history.concat([{
+        squares: squares
+      }]),
+      stepNumber: history.length,
+      isNextBot: !this.state.isNextBot
+    });
+
+    //trick to make AI wait for sometime
+    setTimeout(() => {
+        this.setState({
+            AiThinking: !this.state.AiThinking
+        })
+    }, 1000);
+
+  }
+
+  randomNumber(min, max) {  
+    return Math.floor(Math.random() * (max - min) + min); 
+  }
+  
+  /*componentDidMount(){
+    let whoGoesFirst= Math.random();
+    if( whoGoesFirst >= 0.5){
+      this.setState({
+        isNextBot : !this.state.isNextBot
+      })
+      setTimeout(() => {
+        let squares= this.getCurrentSquares();
+        const rn=this.randomNumber(0,8)
+        console.log(rn);
+        console.log(this.state.isNextBot);
+        squares[rn]= 'O';
+        this.setState({
+          isNextBot: !this.state.isNextBot
+        })
+    }, 1000);
+    }
+  }*/
+
+  componentDidUpdate() {
+
+    const history = this.state.history.slice(0, this.state.stepNumber+1);
+    const current = history[history.length-1];
+    const squares = current.squares.slice();
+
+    let winner = calculateWinner(squares);
+    if (winner === -1 && !this.state.isGameTie) {
+      this.setState({
+        isGameTie: true
+      });
+    } else if (winner !== null && !this.state.winner) {
+      this.setState({
+        winner: winner
+      });
+    } else {
+      if (this.state.isNextBot && !this.state.winner && !this.state.isGameTie && !this.state.AiThinking) {
+        let ai = new AI();
+        let newSquares = ai.handleMove(squares);
+        this.setState({
+            history: history.concat([{
+              squares: newSquares,
+            }]),
+            stepNumber: history.length,
+            isNextBot: !this.state.isNextBot,
+            AiThinking: !this.state.AiThinking
+        });
+      }
+    }
+  }
+
   render() {
+
+    const history= this.state.history;
+    const current= history[this.state.stepNumber];
+
+    const moves = history.map((step, move) => {
+      const desc = move ?
+        'Go to move #' + move :
+        'Go to game start';
+      return (
+        <li key={move}>
+          <button onClick={() => this.jumpTo(move)}>{desc}</button>
+        </li>
+      );
+    });
+
+    let status;
+    if (this.state.isGameTie) {
+      status = "Tie!";
+    } else if (this.state.winner) {
+      status = this.state.winner === 'X'? "You won!": "You lost, bot won!";
+    } else {
+      status = (this.state.isNextBot ? "Bot is making a move...." : "It's your turn, make a move");
+    }
+
     return (
       <div className="game">
         <div className="game-board">
-          <Board />
+          <Board 
+            squares={current.squares}
+            onClick={(i)=> this.handleClick(i)}
+          />
         </div>
         <div className="game-info">
-          <div>{/* status */}</div>
-          <ol>{/* TODO */}</ol>
+          <div className="status"><b className={
+          this.state.isGameTie? 'tie' : (this.state.winner? (
+            this.state.winner === 'X'? 'winner': 'lost'
+          ): (
+            this.state.isNextBot? 'bot':'player'
+          ))
+        }>{status}</b></div>
+          <ol>{moves}</ol>
         </div>
       </div>
     );
