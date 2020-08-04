@@ -136,7 +136,9 @@ export default class Game extends React.Component {
           'Initial state of board';
         return (
           <li key={move}>
-            <button  onClick={() => this.jumpTo(move)}>{desc}</button>
+            <button onClick={() => this.jumpTo(move)}>
+              {move === this.state.stepNumber ? <b style= {{textDecoration: "underline", color: "#1d3354"}}>{desc}</b> : desc}
+            </button>
           </li>
         );
       });

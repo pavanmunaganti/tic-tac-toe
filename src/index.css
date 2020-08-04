@@ -202,8 +202,19 @@ button:hover{
     display: flex;
     flex-direction: column;
   }
+
+  .board{
+    width: 60%;
+    margin-top: 90px;
+  }
+
   .game-board, .game-info{
     width: 100%;
+    height: 800px;
+  }
+
+  .game-board{
+    align-items: normal;
   }
 
   .square{
@@ -212,12 +223,20 @@ button:hover{
 
   .status{
     font-size: 18px;
+    height: 40px;
   }
 
+  .youare>span{
+    font-size: 18px;
+  }
+
+  .game-info> div {
+    margin: 80px 0px;
+  }
 }
 
 
-@media screen and (max-height: 720px){
+@media screen and (max-width: 1300px) and (min-width: 600px){
   .board {
     width: 50%;
     height: 50%;
