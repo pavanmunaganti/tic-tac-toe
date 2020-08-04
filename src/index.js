@@ -135,6 +135,7 @@ class Board extends React.Component {
   render() {
     return (
       <div className="board">
+        <div className="status">{this.props.status}</div>
         <div className="board-row">
           {this.renderSquare(0)}
           {this.renderSquare(1)}
@@ -150,6 +151,7 @@ class Board extends React.Component {
           {this.renderSquare(7)}
           {this.renderSquare(8)}
         </div>
+        <div className="youare"><span>You are playing as:{" "}</span><b className="player">X</b></div>
       </div>
     );
   }
@@ -168,22 +170,32 @@ class Game extends React.Component {
       winner: null,
       isGameTie: false,
       AiThinking: true,
-      stepNumber: 0
+      stepNumber: 0, 
+      isViewingState: false
     };
   }
 
   jumpTo(step){
+    console.log(step)
+    console.log(this.state.history.length)
     if(step === this.state.stepNumber) return;
-    this.setState({
-      stepNumber: step,
-      isNextBot: (step % 2) !== 0,
-      //AiThinking: !this.state.AiThinking
-    })
+    if(step === this.state.history.length-1){
+      console.log("reached end"+step)
+      this.setState({
+        stepNumber: this.state.history.length-1,
+        isViewingState: false
+      })
+    }else{
+      this.setState({
+        stepNumber: step,
+        isViewingState: true
+      })
+    }
   }
 
   handleClick(i) {
     //return if current turn is bot's
-    if (this.state.isNextBot) return;
+    if (this.state.isNextBot || this.state.isViewingState) return;
     
     const history = this.state.history.slice(0, this.state.stepNumber+1);
     const current = history[history.length-1];
@@ -210,8 +222,6 @@ class Game extends React.Component {
             AiThinking: !this.state.AiThinking
         })
     }, 1500);
-    //console.log(this.state.history);
-    //console.log(this.state.stepNumber)
   }
 
   randomNumber(min, max) {  
@@ -238,6 +248,7 @@ class Game extends React.Component {
   }*/
 
   componentDidUpdate() {
+    if(this.state.isViewingState) return;
 
     const history = this.state.history.slice(0, this.state.stepNumber+1);
     const current = history[history.length-1];
@@ -245,8 +256,6 @@ class Game extends React.Component {
 
     let winner = calculateWinner(squares);
     if (winner === -1 && !this.state.isGameTie) {
-      //console.log(this.state.history)
-      //console.log(this.state.stepNumber)
       this.setState({
         isGameTie: true
       });
@@ -266,8 +275,6 @@ class Game extends React.Component {
             isNextBot: !this.state.isNextBot,
             AiThinking: !this.state.AiThinking
         });
-        //console.log(this.state.history)
-        //console.log(this.state.stepNumber)
       }
     }
   }
@@ -288,14 +295,26 @@ class Game extends React.Component {
       );
     });
 
+
     let status;
-    if (this.state.isGameTie) {
-      status = "Tie!";
+    if(this.state.isViewingState){
+      status="Viewing state: "+(this.state.stepNumber);
+    }else if (this.state.isGameTie) {
+      status = "It's a Tie!";
     } else if (this.state.winner) {
       status = this.state.winner === 'X'? "You won!": "You lost, bot won!";
     } else {
       status = (this.state.isNextBot ? "Bot is making a move...." : "It's your turn, make a move");
     }
+
+    const status_bar= <b className={
+      this.state.isViewingState? 'viewing-state':(
+      this.state.isGameTie? 'tie' : (this.state.winner? (
+        this.state.winner === 'X'? 'winner': 'lost'
+      ): (
+        this.state.isNextBot? 'bot':'player'
+      )))
+    }>{status}</b>
 
     return (
       <div className="game">
@@ -303,17 +322,14 @@ class Game extends React.Component {
           <Board 
             squares={current.squares}
             onClick={(i)=> this.handleClick(i)}
+            status={status_bar}
           />
         </div>
         <div className="game-info">
-          <div className="status"><b className={
-          this.state.isGameTie? 'tie' : (this.state.winner? (
-            this.state.winner === 'X'? 'winner': 'lost'
-          ): (
-            this.state.isNextBot? 'bot':'player'
-          ))
-        }>{status}</b></div>
-          <ul>{moves}</ul>
+          <div>
+            <div className="history"><b>Game history</b></div>
+            <ul>{moves}</ul>
+          </div>
         </div>
       </div>
     );
@@ -346,6 +362,7 @@ function calculateWinner(squares) {
 
   return null;
 }
+
 // ========================================
 
 ReactDOM.render(<Game />, document.getElementById("root"));
