@@ -13,6 +13,7 @@ export class Board extends React.Component {
         return (
           <div className="board">
             <div className="status">{this.props.status}</div>
+            {this.props.replay}
             <div className="board-row">
               {this.renderSquare(0)}
               {this.renderSquare(1)}

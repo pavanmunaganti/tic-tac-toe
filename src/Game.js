@@ -8,6 +8,7 @@ export default class Game extends React.Component {
   
     constructor(props){
       super(props);
+      this.resetGame = this.resetGame.bind(this);
       this.state = {
         history: [{
           squares: Array(9).fill(null),
@@ -124,6 +125,26 @@ export default class Game extends React.Component {
         }
       }
     }
+
+    resetGame(){
+      this.setState({
+        history: [{
+          squares: Array(9).fill(null),
+        }],
+        isNextBot: false,
+        winner: null,
+        isGameTie: false,
+        AiThinking: true,
+        stepNumber: 0, 
+        isViewingState: false
+      })
+    }
+
+    replayButton(){
+      return (
+        <button className="replay" onClick={this.resetGame}>Play again</button>
+      );
+    }
   
     render() {
   
@@ -142,17 +163,20 @@ export default class Game extends React.Component {
           </li>
         );
       });
-  
+      
   
       let status;
+      let replay="";
       if(this.state.isViewingState){
         status="Viewing state: "+(this.state.stepNumber);
       }else if (this.state.isGameTie) {
         status = "It's a Tie!";
+        replay= this.replayButton();
       } else if (this.state.winner) {
         status = this.state.winner === 'X'? "You won!": "You lost, bot won!";
+        replay= this.replayButton();
       } else {
-        status = (this.state.isNextBot ? "Bot is making a move...." : "It's your turn, make a move");
+        status = (this.state.isNextBot ? "O is playing...." : "It's your turn....");
       }
   
       const status_bar= <b className={
@@ -163,7 +187,7 @@ export default class Game extends React.Component {
           this.state.isNextBot? 'bot':'player'
         )))
       }>{status}</b>
-  
+      
       return (
         <div className="game">
           <div className="game-board">
@@ -171,6 +195,7 @@ export default class Game extends React.Component {
               squares={current.squares}
               onClick={(i)=> this.handleClick(i)}
               status={status_bar}
+              replay={replay}
             />
           </div>
           <div className="game-info">

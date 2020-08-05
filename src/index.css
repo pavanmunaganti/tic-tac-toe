@@ -1,3 +1,7 @@
+*{
+  box-sizing: border-box;
+}
+
 html, body, #root {
   height: 100%;
   margin: 0px;
@@ -131,6 +135,12 @@ button:hover{
   text-align: center;
 }
 
+.replay{
+  width: 100%;
+  height: 30px;
+  margin-bottom: 15px;
+}
+
 .tie, .lost {
   color: #b02626;
 }
@@ -186,22 +196,28 @@ button:hover{
 
 @media screen and (max-width: 600px){
   .game{
+    height: auto;
     display: flex;
     flex-direction: column;
   }
 
   .board{
-    width: 60%;
-    margin-top: 90px;
+    width: 200px;
+    height: auto;
+    margin: 90px auto;
+  }
+
+  .board-row{
+    height: 60px;
   }
 
   .game-board, .game-info{
     width: 100%;
-    height: 800px;
+    height: auto;
   }
 
   .game-board{
-    align-items: normal;
+    display: block;
   }
 
   .square{
@@ -210,7 +226,13 @@ button:hover{
 
   .status{
     font-size: 18px;
-    height: 40px;
+    height: 60px;
+  }
+
+  .status>b{
+    width: 100%;
+    height: 100%;
+    line-height: 50px;
   }
 
   .youare>span{
